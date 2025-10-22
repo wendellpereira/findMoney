@@ -9,22 +9,23 @@ import { CategoryModal } from './CategoryModal';
 function SpendingCategorizer() {
   const {
     transactions,
-    categoryRules,
     statements,
     selectedCategory,
     setSelectedCategory,
     categoryData,
     totalSpending,
     filteredTransactions,
+    loading,
+    error,
     updateTransactionCategory,
-    importCategoryRules
+    exportData
   } = useTransactionData();
 
   const [editingTransaction, setEditingTransaction] = useState<any>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
 
-  const handleCategoryChange = (transaction: any, newCategory: string) => {
-    updateTransactionCategory(transaction, newCategory);
+  const handleCategoryChange = async (transaction: any, newCategory: string) => {
+    await updateTransactionCategory(transaction, newCategory);
     setShowCategoryModal(false);
     setEditingTransaction(null);
   };
@@ -39,14 +40,42 @@ function SpendingCategorizer() {
     setEditingTransaction(null);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6 flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-slate-800 mb-2">Loading...</h2>
+          <p className="text-slate-600">Fetching your spending data</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6 flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold text-slate-800 mb-2">Error Loading Data</h2>
+          <p className="text-slate-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
       <div className="max-w-7xl mx-auto">
-        <DataManagement 
+        <DataManagement
           statements={statements}
-          categoryRules={categoryRules}
-          transactions={transactions}
-          onImportRules={importCategoryRules}
+          onExportData={exportData}
         />
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
