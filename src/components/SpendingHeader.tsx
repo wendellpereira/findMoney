@@ -1,4 +1,4 @@
-import { DollarSign } from 'lucide-react';
+import { DollarSign } from 'lucide-react'
 
 interface SpendingHeaderProps {
   transactionCount: number;
@@ -20,5 +20,5 @@ export const SpendingHeader = ({ transactionCount, totalSpending }: SpendingHead
         <div className="text-3xl font-bold text-blue-700">${totalSpending.toFixed(2)}</div>
       </div>
     </div>
-  );
-};
+  )
+}

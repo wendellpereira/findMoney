@@ -1,4 +1,4 @@
-import db from './database.js';
+import db from './database.js'
 
 const createTables = () => {
   // Create statements table
@@ -11,7 +11,7 @@ const createTables = () => {
       transaction_count INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
-  `);
+  `)
 
   // Create transactions table with category as string
   db.exec(`
@@ -27,12 +27,12 @@ const createTables = () => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (statement_id) REFERENCES statements(id)
     )
-  `);
-};
+  `)
+}
 
 const initializeDatabase = () => {
-  createTables();
-  console.log('Database tables created successfully');
-};
+  createTables()
+  console.log('Database tables created successfully')
+}
 
-export { initializeDatabase };
+export { initializeDatabase }

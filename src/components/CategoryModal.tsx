@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { Transaction } from '../types';
+import { useMemo } from 'react'
+import { Transaction } from '../types'
 
 interface CategoryModalProps {
   isOpen: boolean;
@@ -18,11 +18,11 @@ export const CategoryModal = ({
 }: CategoryModalProps) => {
   // Extract unique categories from all transactions
   const allCategories = useMemo(() => {
-    const categories = new Set(transactions.map(t => t.category));
-    return Array.from(categories).sort();
-  }, [transactions]);
+    const categories = new Set(transactions.map(t => t.category))
+    return Array.from(categories).sort()
+  }, [transactions])
 
-  if (!isOpen || !transaction) return null;
+  if (!isOpen || !transaction) return null
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -62,5 +62,5 @@ export const CategoryModal = ({
         </button>
       </div>
     </div>
-  );
-};
+  )
+}

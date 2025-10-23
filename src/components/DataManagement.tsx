@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Download, FileUp } from 'lucide-react';
-import { Statement, ExportData } from '../types';
+import { useState } from 'react'
+import { Download, FileUp } from 'lucide-react'
+import { Statement, ExportData } from '../types'
 
 interface DataManagementProps {
   statements: Statement[];
@@ -9,80 +9,80 @@ interface DataManagementProps {
 }
 
 export const DataManagement = ({ statements, onExportData, onStatementsUpdated }: DataManagementProps) => {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [uploadMessage, setUploadMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [uploadMessage, setUploadMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   const handleExport = async () => {
     try {
-      setIsProcessing(true);
-      const exportData = await onExportData();
+      setIsProcessing(true)
+      const exportData = await onExportData()
 
-      const dataStr = JSON.stringify(exportData, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'spending-data-' + exportData.exportDate + '.json';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      const dataStr = JSON.stringify(exportData, null, 2)
+      const dataBlob = new Blob([dataStr], { type: 'application/json' })
+      const url = URL.createObjectURL(dataBlob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'spending-data-' + exportData.exportDate + '.json'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
     } catch (error) {
-      alert('Error exporting data: ' + (error as Error).message);
+      alert('Error exporting data: ' + (error as Error).message)
     } finally {
-      setIsProcessing(false);
+      setIsProcessing(false)
     }
-  };
+  }
 
   const handlePDFUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const file = event.target.files?.[0]
+    if (!file) return
 
     try {
-      setIsProcessing(true);
-      setUploadMessage(null);
+      setIsProcessing(true)
+      setUploadMessage(null)
 
       // Create FormData and append the PDF file
-      const formData = new FormData();
-      formData.append('file', file);
+      const formData = new FormData()
+      formData.append('file', file)
 
       // Send to backend API
       const response = await fetch('/api/pdf-upload', {
         method: 'POST',
         body: formData
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (!response.ok) {
         throw new Error(`
           ${data.error} - ${data.details}
-        ` || 'Failed to upload PDF');
+        ` || 'Failed to upload PDF')
       }
 
       // Show success message
       setUploadMessage({
         type: 'success',
         text: `✓ ${data.message} (${data.statement.transactionCount} transactions imported)`
-      });
+      })
 
       // Refresh statements list
       if (onStatementsUpdated) {
-        onStatementsUpdated();
+        onStatementsUpdated()
       }
 
       // Clear message after 5 seconds
-      setTimeout(() => setUploadMessage(null), 5000);
+      setTimeout(() => setUploadMessage(null), 5000)
     } catch (error) {
       setUploadMessage({
         type: 'error',
         text: `Error: ${(error as Error).message}`
-      });
+      })
     } finally {
-      setIsProcessing(false);
-      event.target.value = '';
+      setIsProcessing(false)
+      event.target.value = ''
     }
-  };
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
@@ -144,5 +144,5 @@ export const DataManagement = ({ statements, onExportData, onStatementsUpdated }
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

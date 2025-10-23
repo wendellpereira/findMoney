@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { useTransactionData } from '../hooks/useTransactionData';
-import { DataManagement } from './DataManagement';
-import { SpendingHeader } from './SpendingHeader';
-import { Charts } from './Charts';
-import { TransactionTable } from './TransactionTable';
-import { CategoryModal } from './CategoryModal';
+import { useState } from 'react'
+import { useTransactionData } from '../hooks/useTransactionData'
+import { DataManagement } from './DataManagement'
+import { SpendingHeader } from './SpendingHeader'
+import { Charts } from './Charts'
+import { TransactionTable } from './TransactionTable'
+import { CategoryModal } from './CategoryModal'
 
 function SpendingCategorizer() {
   const {
@@ -20,26 +20,26 @@ function SpendingCategorizer() {
     updateTransactionCategory,
     exportData,
     refreshData
-  } = useTransactionData();
+  } = useTransactionData()
 
-  const [editingTransaction, setEditingTransaction] = useState<any>(null);
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<any>(null)
+  const [showCategoryModal, setShowCategoryModal] = useState(false)
 
   const handleCategoryChange = async (transaction: any, newCategory: string) => {
-    await updateTransactionCategory(transaction, newCategory);
-    setShowCategoryModal(false);
-    setEditingTransaction(null);
-  };
+    await updateTransactionCategory(transaction, newCategory)
+    setShowCategoryModal(false)
+    setEditingTransaction(null)
+  }
 
   const openCategoryModal = (transaction: any) => {
-    setEditingTransaction(transaction);
-    setShowCategoryModal(true);
-  };
+    setEditingTransaction(transaction)
+    setShowCategoryModal(true)
+  }
 
   const closeCategoryModal = () => {
-    setShowCategoryModal(false);
-    setEditingTransaction(null);
-  };
+    setShowCategoryModal(false)
+    setEditingTransaction(null)
+  }
 
   if (loading) {
     return (
@@ -50,7 +50,7 @@ function SpendingCategorizer() {
           <p className="text-slate-600">Fetching your spending data</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -68,7 +68,7 @@ function SpendingCategorizer() {
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -106,7 +106,7 @@ function SpendingCategorizer() {
         />
       </div>
     </div>
-  );
+  )
 }
 
 export default SpendingCategorizer;``

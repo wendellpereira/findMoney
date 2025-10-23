@@ -1,45 +1,45 @@
-const API_BASE_URL = '/api';
+const API_BASE_URL = '/api'
 
 class ApiError extends Error {
-  status: number;
+  status: number
   
   constructor(message: string, status: number) {
-    super(message);
-    this.status = status;
+    super(message)
+    this.status = status
   }
 }
 
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const url = `${API_BASE_URL}${endpoint}`
   const config: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,
     },
     ...options,
-  };
+  }
 
   try {
-    const response = await fetch(url, config);
+    const response = await fetch(url, config)
     
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new ApiError(errorData.error || 'Request failed', response.status);
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+      throw new ApiError(errorData.error || 'Request failed', response.status)
     }
 
-    return await response.json();
+    return await response.json()
   } catch (error) {
     if (error instanceof ApiError) {
-      throw error;
+      throw error
     }
-    throw new ApiError('Network error', 0);
+    throw new ApiError('Network error', 0)
   }
-};
+}
 
 export const transactionsApi = {
   getAll: (category?: string | null) => {
-    const params = category ? `?category=${encodeURIComponent(category)}` : '';
-    return apiRequest(`/transactions${params}`);
+    const params = category ? `?category=${encodeURIComponent(category)}` : ''
+    return apiRequest(`/transactions${params}`)
   },
   
   getById: (id: string) => apiRequest(`/transactions/${id}`),
@@ -62,7 +62,7 @@ export const transactionsApi = {
     method: 'PUT',
     body: JSON.stringify({ merchant, category }),
   }),
-};
+}
 
 export const statementsApi = {
   getAll: () => apiRequest('/statements'),
@@ -75,10 +75,10 @@ export const statementsApi = {
   delete: (id: number) => apiRequest(`/statements/${id}`, {
     method: 'DELETE',
   }),
-};
+}
 
 export const healthApi = {
   check: () => apiRequest('/health'),
-};
+}
 
-export { ApiError };
+export { ApiError }

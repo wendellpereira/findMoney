@@ -1,4 +1,4 @@
-import { Transaction } from '../types';
+import { Transaction } from '../types'
 
 interface TransactionTableProps {
   transactions: Transaction[];
@@ -66,5 +66,5 @@ export const TransactionTable = ({
         </table>
       </div>
     </div>
-  );
-};
+  )
+}
