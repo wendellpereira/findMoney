@@ -64,52 +64,17 @@ export const transactionsApi = {
   }),
 };
 
-export const categoriesApi = {
-  getAll: () => apiRequest('/categories'),
-  
-  getSummary: () => apiRequest('/categories/summary'),
-  
-  create: (category: any) => apiRequest('/categories', {
-    method: 'POST',
-    body: JSON.stringify(category),
-  }),
-  
-  update: (id: number, category: any) => apiRequest(`/categories/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(category),
-  }),
-  
-  delete: (id: number) => apiRequest(`/categories/${id}`, {
-    method: 'DELETE',
-  }),
-};
-
 export const statementsApi = {
   getAll: () => apiRequest('/statements'),
-  
+
   create: (statement: any) => apiRequest('/statements', {
     method: 'POST',
     body: JSON.stringify(statement),
   }),
-  
+
   delete: (id: number) => apiRequest(`/statements/${id}`, {
     method: 'DELETE',
   }),
-};
-
-export const merchantRulesApi = {
-  getAll: () => apiRequest('/merchant-rules'),
-
-  create: (rule: any) => apiRequest('/merchant-rules', {
-    method: 'POST',
-    body: JSON.stringify(rule),
-  }),
-
-  delete: (id: number) => apiRequest(`/merchant-rules/${id}`, {
-    method: 'DELETE',
-  }),
-
-  export: () => apiRequest('/merchant-rules/export'),
 };
 
 export const healthApi = {

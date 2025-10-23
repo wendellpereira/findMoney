@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Transaction, Statement, CategoryData } from '../types';
-import { transactionsApi, statementsApi, merchantRulesApi, ApiError } from '../services/api';
+import { transactionsApi, statementsApi, ApiError } from '../services/api';
 
 export const useTransactionData = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -36,11 +36,11 @@ export const useTransactionData = () => {
   };
 
   const categoryData = useMemo((): CategoryData[] => {
-    const grouped: Record<string, { value: number; count: number; color?: string }> = {};
-    
+    const grouped: Record<string, { value: number; count: number }> = {};
+
     transactions.forEach(t => {
       if (!grouped[t.category]) {
-        grouped[t.category] = { value: 0, count: 0, color: t.category_color };
+        grouped[t.category] = { value: 0, count: 0 };
       }
       grouped[t.category].value += t.amount;
       grouped[t.category].count += 1;
@@ -49,8 +49,7 @@ export const useTransactionData = () => {
     return Object.entries(grouped).map(([name, data]) => ({
       name,
       value: parseFloat(data.value.toFixed(2)),
-      transaction_count: data.count,
-      color: data.color
+      transaction_count: data.count
     })).sort((a, b) => b.value - a.value);
   }, [transactions]);
 
@@ -79,14 +78,14 @@ export const useTransactionData = () => {
 
   const exportData = async () => {
     try {
-      const [exportedRules, transactionsData, statementsData] = await Promise.all([
-        merchantRulesApi.export(),
+      const [transactionsData, statementsData] = await Promise.all([
         transactionsApi.getAll(),
         statementsApi.getAll()
       ]);
 
       return {
-        ...exportedRules,
+        version: '1.0',
+        exportDate: new Date().toISOString().split('T')[0],
         transactions: transactionsData,
         statements: statementsData
       };

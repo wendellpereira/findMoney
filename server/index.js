@@ -1,4 +1,8 @@
 import dotenv from 'dotenv';
+
+// Load environment variables BEFORE importing other modules
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -6,14 +10,11 @@ import { fileURLToPath } from 'url';
 import { initializeDatabase } from './db/init.js';
 import { seedDatabase } from './db/seed.js';
 import transactionsRouter from './routes/transactions.js';
-import categoriesRouter from './routes/categories.js';
 import statementsRouter from './routes/statements.js';
-import merchantRulesRouter from './routes/merchant-rules.js';
+import pdfUploadRouter from './routes/pdf-upload.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -29,9 +30,8 @@ initializeDatabase();
 
 // API Routes
 app.use('/api/transactions', transactionsRouter);
-app.use('/api/categories', categoriesRouter);
 app.use('/api/statements', statementsRouter);
-app.use('/api/merchant-rules', merchantRulesRouter);
+app.use('/api/pdf-upload', pdfUploadRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

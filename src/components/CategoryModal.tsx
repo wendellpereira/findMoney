@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Transaction } from '../types';
 
 interface CategoryModalProps {
@@ -8,20 +9,19 @@ interface CategoryModalProps {
   onCategoryChange: (transaction: Transaction, newCategory: string) => void;
 }
 
-const allCategories = [
-  'Groceries', 'Dining', 'Transportation', 'Healthcare', 'Shopping', 
-  'Subscriptions', 'Entertainment', 'Utilities', 'Pet Care', 'Home Improvement', 
-  'Gaming', 'Music', 'Education', 'Professional Services', 'Donations', 
-  'Personal Care', 'Travel', 'Fitness', 'Other'
-].sort();
-
-export const CategoryModal = ({ 
-  isOpen, 
-  transaction, 
-  transactions, 
-  onClose, 
-  onCategoryChange 
+export const CategoryModal = ({
+  isOpen,
+  transaction,
+  transactions,
+  onClose,
+  onCategoryChange
 }: CategoryModalProps) => {
+  // Extract unique categories from all transactions
+  const allCategories = useMemo(() => {
+    const categories = new Set(transactions.map(t => t.category));
+    return Array.from(categories).sort();
+  }, [transactions]);
+
   if (!isOpen || !transaction) return null;
 
   return (

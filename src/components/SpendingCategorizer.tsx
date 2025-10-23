@@ -18,7 +18,8 @@ function SpendingCategorizer() {
     loading,
     error,
     updateTransactionCategory,
-    exportData
+    exportData,
+    refreshData
   } = useTransactionData();
 
   const [editingTransaction, setEditingTransaction] = useState<any>(null);
@@ -76,6 +77,7 @@ function SpendingCategorizer() {
         <DataManagement
           statements={statements}
           onExportData={exportData}
+          onStatementsUpdated={refreshData}
         />
 
         <div className="bg-white rounded-2xl shadow-xl p-8">

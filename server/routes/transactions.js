@@ -6,31 +6,29 @@ const router = express.Router();
 router.get('/', (req, res) => {
   try {
     const { category } = req.query;
-    
+
     let query = `
-      SELECT 
+      SELECT
         t.id,
         t.date,
         t.description,
         t.address,
         t.amount,
         t.merchant,
-        c.name as category,
-        c.color as category_color,
+        t.category,
         s.institution as source
       FROM transactions t
-      JOIN categories c ON t.category_id = c.id
       LEFT JOIN statements s ON t.statement_id = s.id
     `;
-    
+
     const params = [];
     if (category && category !== 'all') {
-      query += ' WHERE c.name = ?';
+      query += ' WHERE t.category = ?';
       params.push(category);
     }
-    
+
     query += ' ORDER BY t.date DESC';
-    
+
     const transactions = db.prepare(query).all(...params);
     res.json(transactions);
   } catch (error) {
@@ -43,30 +41,28 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const query = `
-      SELECT 
+      SELECT
         t.id,
         t.date,
         t.description,
         t.address,
         t.amount,
         t.merchant,
-        c.name as category,
-        c.color as category_color,
+        t.category,
         s.institution as source
       FROM transactions t
-      JOIN categories c ON t.category_id = c.id
       LEFT JOIN statements s ON t.statement_id = s.id
       WHERE t.id = ?
     `;
-    
+
     const transaction = db.prepare(query).get(id);
-    
+
     if (!transaction) {
       return res.status(404).json({ error: 'Transaction not found' });
     }
-    
+
     res.json(transaction);
   } catch (error) {
     console.error('Error fetching transaction:', error);
@@ -78,28 +74,26 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   try {
     const { date, description, address, amount, merchant, category } = req.body;
-    
-    // Get category ID
-    const categoryId = db.prepare('SELECT id FROM categories WHERE name = ?').get(category)?.id;
-    if (!categoryId) {
-      return res.status(400).json({ error: 'Invalid category' });
+
+    if (!category) {
+      return res.status(400).json({ error: 'Category is required' });
     }
-    
+
     // Generate ID
     const generateId = (date, merchant, address, amount) => {
       const key = date + merchant + (address || '') + amount;
       return Buffer.from(key).toString('base64').substring(0, 20);
     };
-    
+
     const id = generateId(date, merchant, address, amount);
-    
+
     const insertTransaction = db.prepare(`
-      INSERT INTO transactions (id, date, description, address, amount, category_id, merchant) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO transactions (id, date, description, address, amount, category, merchant, statement_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, NULL)
     `);
-    
-    insertTransaction.run(id, date, description, address, amount, categoryId, merchant);
-    
+
+    insertTransaction.run(id, date, description, address, amount, category, merchant);
+
     res.status(201).json({ id, message: 'Transaction created successfully' });
   } catch (error) {
     console.error('Error creating transaction:', error);
@@ -112,25 +106,23 @@ router.put('/:id', (req, res) => {
   try {
     const { id } = req.params;
     const { date, description, address, amount, merchant, category } = req.body;
-    
-    // Get category ID
-    const categoryId = db.prepare('SELECT id FROM categories WHERE name = ?').get(category)?.id;
-    if (!categoryId) {
-      return res.status(400).json({ error: 'Invalid category' });
+
+    if (!category) {
+      return res.status(400).json({ error: 'Category is required' });
     }
-    
+
     const updateTransaction = db.prepare(`
-      UPDATE transactions 
-      SET date = ?, description = ?, address = ?, amount = ?, category_id = ?, merchant = ?
+      UPDATE transactions
+      SET date = ?, description = ?, address = ?, amount = ?, category = ?, merchant = ?
       WHERE id = ?
     `);
-    
-    const result = updateTransaction.run(date, description, address, amount, categoryId, merchant, id);
-    
+
+    const result = updateTransaction.run(date, description, address, amount, category, merchant, id);
+
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Transaction not found' });
     }
-    
+
     res.json({ message: 'Transaction updated successfully' });
   } catch (error) {
     console.error('Error updating transaction:', error);
@@ -142,14 +134,14 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const deleteTransaction = db.prepare('DELETE FROM transactions WHERE id = ?');
     const result = deleteTransaction.run(id);
-    
+
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Transaction not found' });
     }
-    
+
     res.json({ message: 'Transaction deleted successfully' });
   } catch (error) {
     console.error('Error deleting transaction:', error);
@@ -161,29 +153,20 @@ router.delete('/:id', (req, res) => {
 router.put('/category/bulk', (req, res) => {
   try {
     const { merchant, category } = req.body;
-    
-    // Get category ID
-    const categoryId = db.prepare('SELECT id FROM categories WHERE name = ?').get(category)?.id;
-    if (!categoryId) {
-      return res.status(400).json({ error: 'Invalid category' });
+
+    if (!category) {
+      return res.status(400).json({ error: 'Category is required' });
     }
-    
+
     const updateTransactions = db.prepare(`
-      UPDATE transactions 
-      SET category_id = ?
+      UPDATE transactions
+      SET category = ?
       WHERE merchant = ?
     `);
-    
-    const result = updateTransactions.run(categoryId, merchant);
-    
-    // Update merchant rule
-    const updateMerchantRule = db.prepare(`
-      INSERT OR REPLACE INTO merchant_rules (merchant_name, category_id) 
-      VALUES (?, ?)
-    `);
-    updateMerchantRule.run(merchant, categoryId);
-    
-    res.json({ 
+
+    const result = updateTransactions.run(category, merchant);
+
+    res.json({
       message: `Updated ${result.changes} transactions for merchant ${merchant}`,
       changes: result.changes
     });
