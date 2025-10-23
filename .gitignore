@@ -25,6 +25,7 @@ dist-ssr
 
 # Data
 server/db/seed.js
+server/db/spending.db
 
 # Environment variables
 .env
