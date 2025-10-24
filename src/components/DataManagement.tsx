@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Download, FileUp, Zap } from 'lucide-react'
+import { Download, FileUp, Zap, Brain } from 'lucide-react'
 import { Statement, ExportData } from '../types'
 import { DeduplicationModal } from './DeduplicationModal'
+import { MLDeduplicationModal } from './MLDeduplicationModal'
 
 interface DataManagementProps {
   statements: Statement[];
@@ -13,6 +14,7 @@ export const DataManagement = ({ statements, onExportData, onStatementsUpdated }
   const [isProcessing, setIsProcessing] = useState(false)
   const [uploadMessage, setUploadMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [isDeduplicationModalOpen, setIsDeduplicationModalOpen] = useState(false)
+  const [isMLDeduplicationModalOpen, setIsMLDeduplicationModalOpen] = useState(false)
 
   const handleExport = async () => {
     try {
@@ -154,6 +156,19 @@ export const DataManagement = ({ statements, onExportData, onStatementsUpdated }
             <span className="font-medium">Deduplicate</span>
           </button>
 
+          <button
+            onClick={() => setIsMLDeduplicationModalOpen(true)}
+            disabled={isProcessing}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+              isProcessing
+                ? 'bg-slate-300 text-slate-500'
+                : 'bg-indigo-500 text-white hover:bg-indigo-600'
+            }`}
+          >
+            <Brain size={18} />
+            <span className="font-medium">ML Dedup</span>
+          </button>
+
           <label className="cursor-pointer">
             <input type="file" accept=".pdf" onChange={handlePDFUpload} className="hidden" disabled={isProcessing} />
             <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${isProcessing ? 'bg-slate-300 text-slate-500' : 'bg-purple-500 text-white hover:bg-purple-600'}`}>
@@ -197,6 +212,11 @@ export const DataManagement = ({ statements, onExportData, onStatementsUpdated }
         isOpen={isDeduplicationModalOpen}
         onClose={() => setIsDeduplicationModalOpen(false)}
         onDeduplicate={handleDeduplication}
+      />
+
+      <MLDeduplicationModal
+        isOpen={isMLDeduplicationModalOpen}
+        onClose={() => setIsMLDeduplicationModalOpen(false)}
       />
     </div>
   )

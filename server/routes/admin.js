@@ -761,4 +761,98 @@ router.post('/ml-duplicate-detection', (req, res) => {
   }
 })
 
+/**
+ * POST /api/admin/ml-duplicate-consolidate
+ *
+ * Manually consolidate selected ML-detected duplicate pairs
+ * Allows user to choose which merchant to keep from each pair
+ *
+ * Request body:
+ *   - pairs: array of objects with:
+ *     - merchant1: first merchant name
+ *     - merchant2: second merchant name
+ *     - canonicalMerchant: the merchant name to keep
+ *
+ * Response: transactionsUpdated count
+ */
+router.post('/ml-duplicate-consolidate', (req, res) => {
+  const { pairs = [] } = req.body
+
+  if (!Array.isArray(pairs) || pairs.length === 0) {
+    return res.status(400).json({
+      error: 'Invalid request',
+      message: 'pairs must be a non-empty array'
+    })
+  }
+
+  console.log('\n========== ML MANUAL CONSOLIDATION ==========')
+  console.log(`Consolidating ${pairs.length} selected pairs...`)
+
+  try {
+    let totalUpdated = 0
+
+    for (const pair of pairs) {
+      const { merchant1, merchant2, canonicalMerchant } = pair
+
+      // Validate that canonical merchant is one of the two
+      if (canonicalMerchant !== merchant1 && canonicalMerchant !== merchant2) {
+        console.warn(`⚠ Skipping pair: canonical merchant must be merchant1 or merchant2`)
+        continue
+      }
+
+      // Determine which merchant to replace
+      const toDelete = canonicalMerchant === merchant1 ? merchant2 : merchant1
+
+      try {
+        // Get transactions to update
+        const txns = db
+          .prepare('SELECT id, date, amount FROM transactions WHERE merchant = ?')
+          .all(toDelete)
+
+        console.log(`  Consolidating "${toDelete}" into "${canonicalMerchant}" (${txns.length} transactions)`)
+
+        for (const txn of txns) {
+          const newId = generateTransactionId(txn.date, canonicalMerchant, txn.amount)
+
+          try {
+            db.prepare('UPDATE transactions SET merchant = ?, id = ? WHERE id = ?').run(
+              canonicalMerchant,
+              newId,
+              txn.id
+            )
+            totalUpdated++
+          } catch (err) {
+            if (err.message.includes('UNIQUE constraint failed')) {
+              // Duplicate ID exists, delete this transaction
+              db.prepare('DELETE FROM transactions WHERE id = ?').run(txn.id)
+              totalUpdated++
+              console.log(`    - Removed duplicate transaction`)
+            } else {
+              throw err
+            }
+          }
+        }
+      } catch (err) {
+        console.error(`  ✗ Error consolidating ${toDelete} → ${canonicalMerchant}:`, err.message)
+      }
+    }
+
+    console.log(`Successfully updated ${totalUpdated} transactions`)
+    console.log('========== END CONSOLIDATION ==========\n')
+
+    res.json({
+      success: true,
+      message: `Consolidated ${pairs.length} merchant pairs`,
+      transactionsUpdated: totalUpdated
+    })
+  } catch (error) {
+    console.error('ML manual consolidation error:', error)
+    res.status(500).json({
+      success: false,
+      error: 'ML manual consolidation failed',
+      details: error.message
+    })
+  }
+})
+
 export default router
