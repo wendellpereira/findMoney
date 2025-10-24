@@ -11,6 +11,7 @@ import { initializeDatabase } from './db/init.js'
 import transactionsRouter from './routes/transactions.js'
 import statementsRouter from './routes/statements.js'
 import { pdfUploadRouter } from './routes/pdf-uploads/index.js'
+import adminRouter from './routes/admin.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -31,6 +32,7 @@ initializeDatabase()
 app.use('/api/transactions', transactionsRouter)
 app.use('/api/statements', statementsRouter)
 app.use('/api/pdf-upload', pdfUploadRouter)
+app.use('/api/admin', adminRouter)
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

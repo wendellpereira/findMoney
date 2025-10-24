@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Download, FileUp } from 'lucide-react'
+import { Download, FileUp, Zap } from 'lucide-react'
 import { Statement, ExportData } from '../types'
+import { DeduplicationModal } from './DeduplicationModal'
 
 interface DataManagementProps {
   statements: Statement[];
@@ -11,6 +12,7 @@ interface DataManagementProps {
 export const DataManagement = ({ statements, onExportData, onStatementsUpdated }: DataManagementProps) => {
   const [isProcessing, setIsProcessing] = useState(false)
   const [uploadMessage, setUploadMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [isDeduplicationModalOpen, setIsDeduplicationModalOpen] = useState(false)
 
   const handleExport = async () => {
     try {
@@ -84,6 +86,40 @@ export const DataManagement = ({ statements, onExportData, onStatementsUpdated }
     }
   }
 
+  const handleDeduplication = async (fixes: Array<{ groupId: string; canonicalMerchant: string; transactionIds: string[] }>) => {
+    try {
+      const response = await fetch('/api/admin/deduplicate-transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'fix',
+          fixes
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to deduplicate')
+      }
+
+      setUploadMessage({
+        type: 'success',
+        text: `✓ Deduplicated ${data.summary.transactionsDeleted} transactions`
+      })
+
+      // Refresh statements list
+      if (onStatementsUpdated) {
+        onStatementsUpdated()
+      }
+
+      // Clear message after 5 seconds
+      setTimeout(() => setUploadMessage(null), 5000)
+    } catch (error) {
+      throw new Error((error as Error).message)
+    }
+  }
+
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
       <div className="flex flex-wrap gap-4 items-center justify-between mb-4">
@@ -103,6 +139,19 @@ export const DataManagement = ({ statements, onExportData, onStatementsUpdated }
           >
             <Download size={18} />
             <span className="font-medium">{isProcessing ? 'Exporting...' : 'Export Data'}</span>
+          </button>
+
+          <button
+            onClick={() => setIsDeduplicationModalOpen(true)}
+            disabled={isProcessing}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+              isProcessing
+                ? 'bg-slate-300 text-slate-500'
+                : 'bg-amber-500 text-white hover:bg-amber-600'
+            }`}
+          >
+            <Zap size={18} />
+            <span className="font-medium">Deduplicate</span>
           </button>
 
           <label className="cursor-pointer">
@@ -134,7 +183,7 @@ export const DataManagement = ({ statements, onExportData, onStatementsUpdated }
           ) : (
             statements.map((stmt) => (
               <div key={stmt.id} className="bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
-                <div className="text-sm font-medium text-slate-800">{stmt.institution} - {stmt.month}</div>
+                <div className="text-sm font-medium text-slate-800">{stmt.institution} - {stmt.month} {stmt.revision_number !== 0 ? ` - 🆕: ${stmt.revision_number}` : null}</div>
                 <div className="text-xs text-slate-600">
                   {stmt.actual_transaction_count || stmt.transaction_count} transactions
                 </div>
@@ -143,6 +192,12 @@ export const DataManagement = ({ statements, onExportData, onStatementsUpdated }
           )}
         </div>
       </div>
+
+      <DeduplicationModal
+        isOpen={isDeduplicationModalOpen}
+        onClose={() => setIsDeduplicationModalOpen(false)}
+        onDeduplicate={handleDeduplication}
+      />
     </div>
   )
 }

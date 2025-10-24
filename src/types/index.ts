@@ -18,6 +18,7 @@ export interface Statement {
   transaction_count: number;
   actual_transaction_count?: number;
   created_at: string;
+  revision_number: number;
 }
 
 export interface CategoryData {
