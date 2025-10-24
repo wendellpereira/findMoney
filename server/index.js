@@ -8,10 +8,9 @@ import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { initializeDatabase } from './db/init.js'
-import { seedDatabase } from './db/seed.js'
 import transactionsRouter from './routes/transactions.js'
 import statementsRouter from './routes/statements.js'
-import pdfUploadRouter from './routes/pdf-upload.js'
+import { pdfUploadRouter } from './routes/pdf-uploads/index.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

@@ -9,6 +9,7 @@ const createTables = () => {
       month TEXT NOT NULL,
       upload_date DATE NOT NULL,
       transaction_count INTEGER,
+      revision_number INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `)
