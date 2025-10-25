@@ -201,7 +201,7 @@ export const DeduplicationModal = ({ isOpen, onClose, onDeduplicate }: Deduplica
                         <div className="text-slate-600">{txn.description}</div>
                         {txn.address && <div className="text-slate-500 text-xs">{txn.address}</div>}
                         <div className="text-slate-500 mt-1 text-xs">
-                          {txn.category} • ID: {txn.id.substring(0, 20)}...
+                          {txn.category} • ID: {txn.id}
                         </div>
                       </div>
                     ))}

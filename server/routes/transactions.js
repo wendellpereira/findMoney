@@ -16,6 +16,7 @@ router.get('/', (req, res) => {
         t.amount,
         t.merchant,
         t.category,
+        t.statement_id,
         s.institution as source
       FROM transactions t
       LEFT JOIN statements s ON t.statement_id = s.id
@@ -51,6 +52,7 @@ router.get('/:id', (req, res) => {
         t.amount,
         t.merchant,
         t.category,
+        t.statement_id,
         s.institution as source
       FROM transactions t
       LEFT JOIN statements s ON t.statement_id = s.id
@@ -173,6 +175,33 @@ router.put('/category/bulk', (req, res) => {
   } catch (error) {
     console.error('Error bulk updating transactions:', error)
     res.status(500).json({ error: 'Failed to bulk update transactions' })
+  }
+})
+
+// PUT /api/transactions/description/bulk - bulk update description by matching old description
+router.put('/description/bulk', (req, res) => {
+  try {
+    const { oldDescription, newDescription } = req.body
+
+    if (!oldDescription || !newDescription) {
+      return res.status(400).json({ error: 'Both oldDescription and newDescription are required' })
+    }
+
+    const updateTransactions = db.prepare(`
+      UPDATE transactions
+      SET description = ?
+      WHERE description = ?
+    `)
+
+    const result = updateTransactions.run(newDescription, oldDescription)
+
+    res.json({
+      message: `Updated ${result.changes} transactions with description "${oldDescription}"`,
+      changes: result.changes
+    })
+  } catch (error) {
+    console.error('Error bulk updating descriptions:', error)
+    res.status(500).json({ error: 'Failed to bulk update descriptions' })
   }
 })
 

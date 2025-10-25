@@ -2,10 +2,17 @@ import { useState, useMemo, useEffect } from 'react'
 import { Transaction, Statement, CategoryData } from '../types'
 import { transactionsApi, statementsApi, ApiError } from '../services/api'
 
+export interface FilterState {
+  years: number[]
+  months: number[]
+  statementIds: number[]
+}
+
 export const useTransactionData = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [statements, setStatements] = useState<Statement[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [filters, setFilters] = useState<FilterState>({ years: [], months: [], statementIds: [] })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,10 +42,39 @@ export const useTransactionData = () => {
     }
   }
 
+  // Apply date and statement filters
+  const baseFilteredTransactions = useMemo(() => {
+    let filtered = transactions
+
+    // Filter by years
+    if (filters.years.length > 0) {
+      filtered = filtered.filter(t => {
+        const year = new Date(t.date).getFullYear()
+        return filters.years.includes(year)
+      })
+    }
+
+    // Filter by months
+    if (filters.months.length > 0) {
+      filtered = filtered.filter(t => {
+        const month = new Date(t.date).getMonth() + 1
+        return filters.months.includes(month)
+      })
+    }
+
+    // Filter by statements
+    if (filters.statementIds.length > 0) {
+      // Filter by statement_id foreign key
+      filtered = filtered.filter(t => t.statement_id && filters.statementIds.includes(t.statement_id))
+    }
+
+    return filtered
+  }, [transactions, filters, statements])
+
   const categoryData = useMemo((): CategoryData[] => {
     const grouped: Record<string, { value: number; count: number }> = {}
 
-    transactions.forEach(t => {
+    baseFilteredTransactions.forEach(t => {
       if (!grouped[t.category]) {
         grouped[t.category] = { value: 0, count: 0 }
       }
@@ -51,16 +87,16 @@ export const useTransactionData = () => {
       value: parseFloat(data.value.toFixed(2)),
       transaction_count: data.count
     })).sort((a, b) => b.value - a.value)
-  }, [transactions])
+  }, [baseFilteredTransactions])
 
   const totalSpending = useMemo(() => {
-    return transactions.reduce((sum, t) => sum + t.amount, 0)
-  }, [transactions])
+    return baseFilteredTransactions.reduce((sum, t) => sum + t.amount, 0)
+  }, [baseFilteredTransactions])
 
   const filteredTransactions = useMemo(() => {
-    if (selectedCategory === 'all') return transactions
-    return transactions.filter((t) => t.category === selectedCategory)
-  }, [transactions, selectedCategory])
+    if (selectedCategory === 'all') return baseFilteredTransactions
+    return baseFilteredTransactions.filter((t) => t.category === selectedCategory)
+  }, [baseFilteredTransactions, selectedCategory])
 
   const updateTransactionCategory = async (transaction: Transaction, newCategory: string) => {
     try {
@@ -102,6 +138,8 @@ export const useTransactionData = () => {
     statements,
     selectedCategory,
     setSelectedCategory,
+    filters,
+    setFilters,
     categoryData,
     totalSpending,
     filteredTransactions,

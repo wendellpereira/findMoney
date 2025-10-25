@@ -5,6 +5,9 @@ import { SpendingHeader } from './SpendingHeader'
 import { Charts } from './Charts'
 import { TransactionTable } from './TransactionTable'
 import { CategoryModal } from './CategoryModal'
+import { TransactionFilters } from './TransactionFilters'
+import { DescriptionEditModal } from './DescriptionEditModal'
+import { transactionsApi } from '../services/api'
 
 function SpendingCategorizer() {
   const {
@@ -12,6 +15,7 @@ function SpendingCategorizer() {
     statements,
     selectedCategory,
     setSelectedCategory,
+    setFilters,
     categoryData,
     totalSpending,
     filteredTransactions,
@@ -24,6 +28,8 @@ function SpendingCategorizer() {
 
   const [editingTransaction, setEditingTransaction] = useState<any>(null)
   const [showCategoryModal, setShowCategoryModal] = useState(false)
+  const [editingDescription, setEditingDescription] = useState<string | null>(null)
+  const [showDescriptionModal, setShowDescriptionModal] = useState(false)
 
   const handleCategoryChange = async (transaction: any, newCategory: string) => {
     await updateTransactionCategory(transaction, newCategory)
@@ -39,6 +45,22 @@ function SpendingCategorizer() {
   const closeCategoryModal = () => {
     setShowCategoryModal(false)
     setEditingTransaction(null)
+  }
+
+  const openDescriptionModal = (description: string) => {
+    setEditingDescription(description)
+    setShowDescriptionModal(true)
+  }
+
+  const closeDescriptionModal = () => {
+    setShowDescriptionModal(false)
+    setEditingDescription(null)
+  }
+
+  const handleDescriptionUpdate = async (oldDescription: string, newDescription: string) => {
+    await transactionsApi.bulkUpdateDescription(oldDescription, newDescription)
+    // Refresh data to show updated descriptions
+    await refreshData()
   }
 
   if (loading) {
@@ -80,29 +102,43 @@ function SpendingCategorizer() {
           onStatementsUpdated={refreshData}
         />
 
+        <TransactionFilters
+          transactions={transactions}
+          statements={statements}
+          onFilterChange={setFilters}
+        />
+
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <SpendingHeader 
-            transactionCount={transactions.length}
+          <SpendingHeader
+            transactionCount={filteredTransactions.length}
             totalSpending={totalSpending}
           />
 
           <Charts categoryData={categoryData} />
 
-          <TransactionTable 
+          <TransactionTable
             transactions={transactions}
             filteredTransactions={filteredTransactions}
             selectedCategory={selectedCategory}
             onCategoryChange={setSelectedCategory}
             onOpenCategoryModal={openCategoryModal}
+            onOpenDescriptionModal={openDescriptionModal}
           />
         </div>
 
-        <CategoryModal 
+        <CategoryModal
           isOpen={showCategoryModal}
           transaction={editingTransaction}
           transactions={transactions}
           onClose={closeCategoryModal}
           onCategoryChange={handleCategoryChange}
+        />
+
+        <DescriptionEditModal
+          isOpen={showDescriptionModal}
+          currentDescription={editingDescription || ''}
+          onClose={closeDescriptionModal}
+          onSave={handleDescriptionUpdate}
         />
       </div>
     </div>

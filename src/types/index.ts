@@ -8,6 +8,7 @@ export interface Transaction {
   category_color?: string;
   merchant: string;
   source?: string;
+  statement_id?: number;
 }
 
 export interface Statement {

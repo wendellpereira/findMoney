@@ -6,14 +6,16 @@ interface TransactionTableProps {
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
   onOpenCategoryModal: (transaction: Transaction) => void;
+  onOpenDescriptionModal: (description: string) => void;
 }
 
-export const TransactionTable = ({ 
-  transactions, 
-  filteredTransactions, 
-  selectedCategory, 
-  onCategoryChange, 
-  onOpenCategoryModal 
+export const TransactionTable = ({
+  transactions,
+  filteredTransactions,
+  selectedCategory,
+  onCategoryChange,
+  onOpenCategoryModal,
+  onOpenDescriptionModal
 }: TransactionTableProps) => {
   return (
     <div className="mb-4">
@@ -46,12 +48,17 @@ export const TransactionTable = ({
               <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50">
                 <td className="p-3 text-sm text-slate-600">{t.date}</td>
                 <td className="p-3">
-                  <div className="text-sm text-slate-800 font-medium">{t.description}</div>
-                  {t.address && <div className="text-xs text-slate-500 mt-1">{t.address}</div>}
+                  <button
+                    onClick={() => onOpenDescriptionModal(t.description)}
+                    className="text-left w-full text-sm text-slate-800 font-medium hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition-colors cursor-pointer"
+                  >
+                    {t.description}
+                  </button>
+                  {t.address && <div className="text-xs text-slate-500 mt-1 px-2">{t.address}</div>}
                 </td>
                 <td className="p-3">
-                  <button 
-                    onClick={() => onOpenCategoryModal(t)} 
+                  <button
+                    onClick={() => onOpenCategoryModal(t)}
                     className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full hover:bg-blue-200"
                   >
                     {t.category}

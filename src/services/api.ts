@@ -62,6 +62,11 @@ export const transactionsApi = {
     method: 'PUT',
     body: JSON.stringify({ merchant, category }),
   }),
+
+  bulkUpdateDescription: (oldDescription: string, newDescription: string) => apiRequest('/transactions/description/bulk', {
+    method: 'PUT',
+    body: JSON.stringify({ oldDescription, newDescription }),
+  }),
 }
 
 export const statementsApi = {

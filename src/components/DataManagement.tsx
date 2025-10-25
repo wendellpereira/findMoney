@@ -198,7 +198,7 @@ export const DataManagement = ({ statements, onExportData, onStatementsUpdated }
           ) : (
             statements.map((stmt) => (
               <div key={stmt.id} className="bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
-                <div className="text-sm font-medium text-slate-800">{stmt.institution} - {stmt.month} {stmt.revision_number !== 0 ? ` - 🆕: ${stmt.revision_number}` : null}</div>
+                <div className="text-sm font-medium text-slate-800">{stmt.institution} - {stmt.month} {stmt.revision_number !== 0 ? ` - v${stmt.revision_number}` : null}</div>
                 <div className="text-xs text-slate-600">
                   {stmt.actual_transaction_count || stmt.transaction_count} transactions
                 </div>
