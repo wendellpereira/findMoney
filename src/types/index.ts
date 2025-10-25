@@ -34,3 +34,9 @@ export interface ExportData {
   transactions: Transaction[];
   statements: Statement[];
 }
+
+export interface FilterState {
+  years: number[]
+  months: number[]
+  statementIds: number[]
+}

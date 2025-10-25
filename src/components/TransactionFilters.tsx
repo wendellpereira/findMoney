@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Calendar, FileText, ChevronDown, ChevronUp } from 'lucide-react'
-import { Transaction, Statement } from '../types'
+import { Transaction, Statement, FilterState } from '../types'
 
 interface TransactionFiltersProps {
   transactions: Transaction[]
@@ -8,18 +8,14 @@ interface TransactionFiltersProps {
   onFilterChange: (filters: FilterState) => void
 }
 
-export interface FilterState {
-  years: number[]
-  months: number[]
-  statementIds: number[]
-}
-
-export const TransactionFilters = ({ transactions, statements, onFilterChange }: TransactionFiltersProps) => {
-  const [filters, setFilters] = useState<FilterState>({
+const emptyFilter = {
     years: [],
     months: [],
-    statementIds: []
-  })
+    statementIds: [],
+  }
+
+export const TransactionFilters = ({ transactions, statements, onFilterChange }: TransactionFiltersProps) => {
+  const [filters, setFilters] = useState<FilterState>(emptyFilter)
 
   const [expandedSections, setExpandedSections] = useState({
     years: true,
@@ -103,9 +99,8 @@ export const TransactionFilters = ({ transactions, statements, onFilterChange }:
   }
 
   const clearAllFilters = () => {
-    const emptyFilters = { years: [], months: [], statementIds: [] }
-    setFilters(emptyFilters)
-    onFilterChange(emptyFilters)
+    setFilters(emptyFilter)
+    onFilterChange(emptyFilter)
   }
 
   const hasActiveFilters = filters.years.length > 0 || filters.months.length > 0 || filters.statementIds.length > 0

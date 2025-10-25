@@ -1,18 +1,14 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Transaction, Statement, CategoryData } from '../types'
+import { Transaction, Statement, CategoryData, FilterState } from '../types'
 import { transactionsApi, statementsApi, ApiError } from '../services/api'
 
-export interface FilterState {
-  years: number[]
-  months: number[]
-  statementIds: number[]
-}
+
 
 export const useTransactionData = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [statements, setStatements] = useState<Statement[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [filters, setFilters] = useState<FilterState>({ years: [], months: [], statementIds: [] })
+  const [filters, setFilters] = useState<FilterState>({ years: [], months: [], statementIds: []})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -69,7 +65,7 @@ export const useTransactionData = () => {
     }
 
     return filtered
-  }, [transactions, filters, statements])
+  }, [transactions, filters])
 
   const categoryData = useMemo((): CategoryData[] => {
     const grouped: Record<string, { value: number; count: number }> = {}
