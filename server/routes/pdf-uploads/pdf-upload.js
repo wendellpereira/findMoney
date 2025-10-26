@@ -435,7 +435,24 @@ function buildUploadResponse(isNewStatement, revisionNumber, institution, month,
 /**
  * Build system prompt with category taxonomy and examples
  */
-function buildSystemPrompt(existingCategories) {
+function buildSystemPrompt() {
+  /**
+    todo: customer from statement:
+      - extract customer name
+      - change schema to add customer on statement table
+      - adjust prompt
+      - adjust response validation
+      - update endpoint(s)
+      - update frontend
+   *  */
+
+  // Get existing categories from database
+  const existingCategories = db.prepare(
+    'SELECT DISTINCT category FROM transactions ORDER BY category'
+  ).all().map(row => row.category)
+
+  console.log('Existing categories:', existingCategories.length, existingCategories)
+ 
   const categoryGuide = existingCategories.length > 0
     ? `Existing user categories: ${existingCategories.join(', ')}\nPrefer these when applicable. Create new categories only if none fit.`
     : ''
@@ -445,7 +462,7 @@ function buildSystemPrompt(existingCategories) {
     `${catName}: ${catData.description}\nExamples: ${catData.merchants.slice(0, 3).join(', ')}`
   ).join('\n')
 
-  // Format all 104 examples
+  // Format all transaction  examples
   const examplesText = PARSING_EXAMPLES.map((ex) => `
 {"date":"${ex.output.date}","description":"${ex.output.description}","address":"${ex.output.address}","amount":${ex.output.amount},"category":"${ex.output.category}"}`).join('\n')
 
@@ -501,16 +518,10 @@ ${examplesText}`
 async function parseTransactionsWithAI(pdfText) {
   console.log('\n========== ANTHROPIC API REQUEST ==========')
 
-  // Get existing categories from database
-  const existingCategories = db.prepare(
-    'SELECT DISTINCT category FROM transactions ORDER BY category'
-  ).all().map(row => row.category)
-
-  console.log('Existing categories:', existingCategories.length, existingCategories)
   console.log('PDF text length:', pdfText.length, 'characters')
 
   // Build the system prompt
-  const systemPrompt = buildSystemPrompt(existingCategories)
+  const systemPrompt = buildSystemPrompt()
 
   const anthropicClient = getAnthropicClient()
 
@@ -606,7 +617,7 @@ router.post('/', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'No file provided' })
     }
 
-    console.log('\n========== PDF UPLOAD STARTED ==========')
+    console.log('\n========== PDF UPLOAD STARTED ========== time:' + new Date().toISOString())
     console.log('File name:', req.file.originalname)
     console.log('File size:', req.file.size, 'bytes')
 
@@ -658,7 +669,7 @@ router.post('/', upload.single('file'), async (req, res) => {
 
     console.log('Inserted:', totalInserted, 'transactions')
     console.log('Skipped:', skippedTransactions.length, 'transactions')
-    console.log('========== PDF UPLOAD COMPLETED ==========\n')
+    console.log('========== PDF UPLOAD COMPLETED ========== time:' + new Date().toISOString() + '\n')
 
     // Handle zero inserts case
     if (shouldReturn) {

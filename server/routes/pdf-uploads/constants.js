@@ -198,7 +198,7 @@ export const PARSING_EXAMPLES = [
     input: '08/31/2025 DD *DOORDASH MCDONALDS303 2ND STREET 8559731040 94107 CA USA 2% $1.13 $56.51',
     output: {
       date: '08/31/2025',
-      description: 'DD *DOORDASH',
+      description: 'DD *DOORDASH MCDONALDS',
       address: '303 2ND STREET CA 94107',
       amount: 56.51,
       category: 'Dining'
@@ -248,7 +248,7 @@ export const PARSING_EXAMPLES = [
     input: '09/02/2025 DD *DOORDASH DARBARIND303 2ND STREET 8559731040 94107 CA USA 2% $0.72 $36.00',
     output: {
       date: '09/02/2025',
-      description: 'DD *DOORDASH',
+      description: 'DD *DOORDASH DARBARIND',
       address: '303 2ND STREET CA 94107',
       amount: 36.00,
       category: 'Dining'
@@ -268,7 +268,7 @@ export const PARSING_EXAMPLES = [
     input: '09/03/2025 DD *DOORDASH TENKARAME303 2ND STREET 8559731040 94107 CA USA 2% $0.44 $21.89',
     output: {
       date: '09/03/2025',
-      description: 'DD *DOORDASH',
+      description: 'DD *DOORDASH TENKARAME',
       address: '303 2ND STREET CA 94107',
       amount: 21.89,
       category: 'Dining'
@@ -318,7 +318,7 @@ export const PARSING_EXAMPLES = [
     input: '09/05/2025 DD *DOORDASH MYBURGER 303 2ND STREET 8559731040 94107 CA USA 2% $0.65 $32.42',
     output: {
       date: '09/05/2025',
-      description: 'DD *DOORDASH',
+      description: 'DD *DOORDASH MYBURGER',
       address: '303 2ND STREET CA 94107',
       amount: 32.42,
       category: 'Dining'
@@ -358,7 +358,7 @@ export const PARSING_EXAMPLES = [
     input: '09/08/2025 DD *DOORDASH HAWAIIPOK303 2ND STREET 8559731040 94107 CA USA 2% $0.71 $35.53',
     output: {
       date: '09/08/2025',
-      description: 'DD *DOORDASH',
+      description: 'DD *DOORDASH HAWAIIPOK',
       address: '303 2ND STREET CA 94107',
       amount: 35.53,
       category: 'Dining'
@@ -628,7 +628,7 @@ export const PARSING_EXAMPLES = [
     input: '09/22/2025 DD *DOORDASH MYBURGER 303 2ND STREET 8559731040 94107 CA USA 2% $0.95 $47.58',
     output: {
       date: '09/22/2025',
-      description: 'DD *DOORDASH',
+      description: 'DD *DOORDASH MYBURGER',
       address: '303 2ND STREET CA 94107',
       amount: 47.58,
       category: 'Dining'
@@ -678,7 +678,7 @@ export const PARSING_EXAMPLES = [
     input: '09/26/2025 DD *DOORDASH GYU-KAKUJ303 2ND STREET 8559731040 94107 CA USA 2% $0.40 $19.92',
     output: {
       date: '09/26/2025',
-      description: 'DD *DOORDASH',
+      description: 'DD *DOORDASH GYU-KAKU',
       address: '303 2ND STREET CA 94107',
       amount: 19.92,
       category: 'Dining'
@@ -688,7 +688,7 @@ export const PARSING_EXAMPLES = [
     input: '09/27/2025 DD *DOORDASH POPEYESLO303 2ND STREET 8559731040 94107 CA USA 2% $1.19 $59.61',
     output: {
       date: '09/27/2025',
-      description: 'DD *DOORDASH',
+      description: 'DD *DOORDASH POPEYESLO',
       address: '303 2ND STREET CA 94107',
       amount: 59.61,
       category: 'Dining'
@@ -758,7 +758,7 @@ export const PARSING_EXAMPLES = [
     input: '07/02/2025 DD *DOORDASHMCDONALDS 303 2ND STREET 8559731040 94107 CA USA 2% $0.46 $23.09',
     output: {
       date: '07/02/2025',
-      description: 'DD *DOORDASH',
+      description: 'DD *DOORDASH MCDONALDS',
       address: '303 2ND STREET CA 94107',
       amount: 23.09,
       category: 'Dining'
@@ -848,7 +848,7 @@ export const PARSING_EXAMPLES = [
     input: '07/05/2025 DD *DOORDASHMCDONALDS 303 2ND STREET 8559731040 94107 CA USA 2% $0.59 $29.43',
     output: {
       date: '07/05/2025',
-      description: 'DD *DOORDASH',
+      description: 'DD *DOORDASH MCDONALDS',
       address: '303 2ND STREET CA 94107',
       amount: 29.43,
       category: 'Dining'
@@ -1138,7 +1138,7 @@ export const PARSING_EXAMPLES = [
     input: '07/23/2025 DD *DOORDASHGYU-KAKUJA303 2ND STREET 8559731040 94107 CA USA 2% $0.58 $29.09',
     output: {
       date: '07/23/2025',
-      description: 'DD *DOORDASH',
+      description: 'DD *DOORDASH GYU-KAKU',
       address: '303 2ND STREET CA 94107',
       amount: 29.09,
       category: 'Dining'
@@ -1198,7 +1198,7 @@ export const PARSING_EXAMPLES = [
     input: '07/26/2025 DD *DOORDASHFIVEGUYSBU303 2ND STREET 8559731040 94107 CA USA 2% $0.85 $42.34',
     output: {
       date: '07/26/2025',
-      description: 'DD *DOORDASH',
+      description: 'DD *DOORDASH FIVEGUYSBU',
       address: '303 2ND STREET CA 94107',
       amount: 42.34,
       category: 'Dining'
